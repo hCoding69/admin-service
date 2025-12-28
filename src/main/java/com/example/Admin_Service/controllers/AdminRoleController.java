@@ -24,10 +24,5 @@ public class AdminRoleController {
     }
 
 
-    @GetMapping("/admin/roles")
-    public Mono<List<RoleDTO>> createRoles(String token){
-        return adminRoleService.(token);
-    }
 
-    public
 }
