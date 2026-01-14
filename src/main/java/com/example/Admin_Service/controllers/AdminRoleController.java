@@ -3,26 +3,73 @@ package com.example.Admin_Service.controllers;
 
 import com.example.Admin_Service.dto.RoleDTO;
 import com.example.Admin_Service.services.AdminRoleService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
 
+
+
 @RestController
-@RequestMapping("/api/admin")
+@RequestMapping("/api/admin/roles")
 public class AdminRoleController {
+
     private final AdminRoleService adminRoleService;
-    public AdminRoleController(AdminRoleService adminRoleService){
+
+    public AdminRoleController(AdminRoleService adminRoleService) {
         this.adminRoleService = adminRoleService;
     }
 
-    @GetMapping("/roles")
-    public Mono<List<RoleDTO>> getRoles(String token){
-        return adminRoleService.getRoles(token);
+    @GetMapping
+    public Mono<List<RoleDTO>> getRoles(HttpServletRequest request) {
+
+
+        return adminRoleService.getRoles();
+    }
+
+    @GetMapping("/with-permissions")
+    public Mono<ResponseEntity<Object>> getRolesWithPermissions() {
+        return adminRoleService.getRolesWithPermissions()
+                .map(ResponseEntity::ok);
     }
 
 
+    @GetMapping("/with-permissions/{id}")
+    public Mono<ResponseEntity<RoleDTO>> getRoleWithPermissions(
 
+            @PathVariable Long id) {
+
+        return adminRoleService.getRoleWithPermissions(id)
+                .map(ResponseEntity::ok);
+    }
+
+    @PostMapping
+    public Mono<ResponseEntity<RoleDTO>> createRole(
+            @RequestBody RoleDTO roleDTO) {
+
+        return adminRoleService.createRole(roleDTO)
+                .map(ResponseEntity::ok);
+    }
+
+    @PutMapping("/{id}")
+    public Mono<ResponseEntity<RoleDTO>> updateRole(
+            @PathVariable Long id,
+            @RequestBody RoleDTO roleDTO) {
+
+        return adminRoleService.updateRole(id, roleDTO)
+                .map(ResponseEntity::ok);
+    }
+
+    @DeleteMapping("/{id}")
+    public Mono<ResponseEntity<Void>> deleteRole(
+            @PathVariable Long id) {
+
+        return adminRoleService.delete(id)
+                .thenReturn(ResponseEntity.ok().build());
+    }
 }
