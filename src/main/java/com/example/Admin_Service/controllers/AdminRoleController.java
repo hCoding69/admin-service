@@ -2,6 +2,7 @@ package com.example.Admin_Service.controllers;
 
 
 import com.example.Admin_Service.dto.RoleDTO;
+import com.example.Admin_Service.dto.RoleWithPermissionsDTO;
 import com.example.Admin_Service.services.AdminRoleService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -33,9 +34,10 @@ public class AdminRoleController {
     }
 
     @GetMapping("/with-permissions")
-    public Mono<ResponseEntity<Object>> getRolesWithPermissions() {
+    public Mono<ResponseEntity<List<RoleWithPermissionsDTO>>> getRolesWithPermissions() {
         return adminRoleService.getRolesWithPermissions()
-                .map(ResponseEntity::ok);
+                .map(roles -> ResponseEntity.ok(roles))
+                .defaultIfEmpty(ResponseEntity.noContent().build());
     }
 
 

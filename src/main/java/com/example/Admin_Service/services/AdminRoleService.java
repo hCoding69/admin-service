@@ -2,6 +2,7 @@ package com.example.Admin_Service.services;
 
 import com.example.Admin_Service.config.WebClientConfig;
 import com.example.Admin_Service.dto.RoleDTO;
+import com.example.Admin_Service.dto.RoleWithPermissionsDTO;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -27,12 +28,25 @@ public class AdminRoleService {
     }
 
 
-    public Mono<Object> getRolesWithPermissions() {
+    public Mono<List<RoleWithPermissionsDTO>> getRolesWithPermissions() {
         return webClient.get()
                 .uri("http://localhost:8082/api/roles/with-permissions")
                 .retrieve()
-                .bodyToMono(Object.class);
+                // Gestion des erreurs HTTP
+                .onStatus(status -> status.is4xxClientError() || status.is5xxServerError(),
+                        clientResponse -> clientResponse.bodyToMono(String.class)
+                                .doOnNext(body ->
+                                        System.err.println("Erreur WebClient: " + body))
+                                .flatMap(body -> Mono.error(
+                                        new RuntimeException("Erreur HTTP " + clientResponse.statusCode() + ": " + body))))
+                .bodyToFlux(RoleWithPermissionsDTO.class)
+                .collectList()
+                // Gestion des exceptions dans la chaîne réactive
+                .doOnError(e -> System.err.println("Exception lors du getRolesWithPermissions: " + e.getMessage()));
     }
+
+
+
 
 
 
