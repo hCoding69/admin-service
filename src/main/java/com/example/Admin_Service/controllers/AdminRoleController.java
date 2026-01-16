@@ -42,7 +42,7 @@ public class AdminRoleController {
 
 
     @GetMapping("/with-permissions/{id}")
-    public Mono<ResponseEntity<RoleDTO>> getRoleWithPermissions(
+    public Mono<ResponseEntity<RoleWithPermissionsDTO>> getRoleWithPermissions(
 
             @PathVariable Long id) {
 

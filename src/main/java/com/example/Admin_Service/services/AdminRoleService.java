@@ -50,7 +50,7 @@ public class AdminRoleService {
 
 
 
-    public Mono<RoleDTO> getRoleWithPermissions(Long id) {
+    public Mono<RoleWithPermissionsDTO> getRoleWithPermissions(Long id) {
         return webClient.get()
                 .uri("http://localhost:8082/api/roles/with-permissions/{id}", id)
                 .retrieve()
@@ -58,7 +58,7 @@ public class AdminRoleService {
                         response.bodyToMono(String.class)
                                 .map(body -> new RuntimeException("ERROR FROM AUTHSERVICE: " + body))
                 )
-                .bodyToMono(RoleDTO.class);
+                .bodyToMono(RoleWithPermissionsDTO.class);
     }
 
 
