@@ -27,28 +27,25 @@ public class PermissionService {
 
     }
 
-    public Mono<PermissionDTO> createPermission(String token, PermissionDTO req){
+    public Mono<PermissionDTO> createPermission(PermissionDTO req){
         return webClient.post()
                 .uri("http://localhost:8082/api/permissions")
-                .header("Authorization", "Bearer " + token)
                 .bodyValue(req)
                 .retrieve()
                 .bodyToMono(PermissionDTO.class);
     }
 
-    public Mono<PermissionDTO> editPermission(String token, Long id, PermissionDTO req){
+    public Mono<PermissionDTO> editPermission(Long id, PermissionDTO req){
         return webClient.put()
                 .uri("http://localhost:8082/api/permissions/{id}", id)
-                .header("Authorization", "Bearer " + token)
                 .bodyValue(req)
                 .retrieve()
                 .bodyToMono(PermissionDTO.class);
     }
 
-    public Mono<Void> deletePermission(String token, Long id) {
+    public Mono<Void> deletePermission(Long id) {
         return webClient.delete()
                 .uri("http://localhost:8082/api/permissions/{id}", id)
-                .header("Authorization", token)
                 .retrieve()
                 .bodyToMono(Void.class);
     }

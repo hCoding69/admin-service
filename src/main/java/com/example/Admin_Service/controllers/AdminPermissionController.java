@@ -27,29 +27,26 @@ public class AdminPermissionController {
 
     @PostMapping
     public Mono<ResponseEntity<PermissionDTO>> createPermission(
-            @RequestHeader("Authorization") String token,
             @RequestBody PermissionDTO request) {
 
-        return permissionService.createPermission(token, request)
+        return permissionService.createPermission(request)
                 .map(ResponseEntity::ok);
     }
 
     @PutMapping("/{id}")
     public Mono<ResponseEntity<PermissionDTO>> updatePermission(
-            @RequestHeader("Authorization") String token,
             @PathVariable Long id,
             @RequestBody PermissionDTO request) {
 
-        return permissionService.editPermission(token, id, request)
+        return permissionService.editPermission(id, request)
                 .map(ResponseEntity::ok);
     }
 
     @DeleteMapping("/{id}")
     public Mono<ResponseEntity<Void>> deletePermission(
-            @RequestHeader("Authorization") String token,
             @PathVariable Long id) {
 
-        return permissionService.deletePermission(token, id)
+        return permissionService.deletePermission(id)
                 .thenReturn(ResponseEntity.ok().build());
     }
 }

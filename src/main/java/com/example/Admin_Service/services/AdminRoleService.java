@@ -1,9 +1,11 @@
 package com.example.Admin_Service.services;
 
 import com.example.Admin_Service.config.WebClientConfig;
+import com.example.Admin_Service.dto.PermissionDTO;
 import com.example.Admin_Service.dto.RoleDTO;
 import com.example.Admin_Service.dto.RoleWithPermissionsDTO;
 import org.springframework.http.HttpStatusCode;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
@@ -85,6 +87,25 @@ public class AdminRoleService {
                 .uri("http://localhost:8082/api/roles/{id}", id)
                 .retrieve()
                 .bodyToMono(Void.class);
+    }
+
+    public Mono<String> addPermissionToRole(List<PermissionDTO> permissions, Long roleId) {
+        return webClient.post()
+                .uri("http://localhost:8082/api/roles/{roleId}/permissions", roleId)
+                .bodyValue(permissions)
+                .retrieve()
+                .onStatus(HttpStatusCode::is4xxClientError, resp ->
+                        resp.bodyToMono(String.class)
+                                .flatMap(msg -> Mono.error(new RuntimeException(msg)))
+                )
+                .bodyToMono(String.class);
+    }
+
+    public Mono<String> removePermissionFromRole(Long roleId, Long permissionId){
+        return webClient.delete()
+                .uri("http://localhost:8082/api/roles/{roleId}/permissions/{permissionId}", roleId, permissionId)
+                .retrieve()
+                .bodyToMono(String.class);
     }
 
 }

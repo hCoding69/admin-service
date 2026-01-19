@@ -1,6 +1,7 @@
 package com.example.Admin_Service.controllers;
 
 
+import com.example.Admin_Service.dto.PermissionDTO;
 import com.example.Admin_Service.dto.RoleDTO;
 import com.example.Admin_Service.dto.RoleWithPermissionsDTO;
 import com.example.Admin_Service.services.AdminRoleService;
@@ -73,5 +74,25 @@ public class AdminRoleController {
 
         return adminRoleService.delete(id)
                 .thenReturn(ResponseEntity.ok().build());
+    }
+
+    // Ajouter une ou plusieurs permissions à un rôle
+    @PostMapping("/{roleId}/permissions")
+    public Mono<ResponseEntity<String>> addPermissionsToRole(
+            @PathVariable Long roleId,
+            @RequestBody List<PermissionDTO> permissions) {
+
+        return adminRoleService.addPermissionToRole(permissions, roleId)
+                .map(msg -> ResponseEntity.ok(msg))
+                .onErrorResume(e -> Mono.just(
+                        ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                                .body(e.getMessage())
+                ));
+    }
+    @DeleteMapping("/{roleId}/permissions/{permissionId}")
+    public Mono<ResponseEntity<String>> removePermissionFromRole(@PathVariable Long roleId,
+                                                                 @PathVariable Long permissionId) {
+        return adminRoleService.removePermissionFromRole(roleId, permissionId)
+                .map(ResponseEntity::ok);
     }
 }
