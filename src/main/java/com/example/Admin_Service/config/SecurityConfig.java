@@ -1,44 +1,36 @@
 package com.example.Admin_Service.config;
 
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
-import org.springframework.security.config.Customizer;
-import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.config.annotation.method.configuration.EnableReactiveMethodSecurity;
+import org.springframework.security.config.web.server.SecurityWebFiltersOrder;
+import org.springframework.security.config.web.server.ServerHttpSecurity;
+import org.springframework.security.web.server.SecurityWebFilterChain;
 
 @Configuration
-@EnableMethodSecurity
+@EnableReactiveMethodSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
 
+    private final AuthenticationHeaderWebFilter authWebFilter;
+
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
 
         return http
-                // ❌ pas de CSRF (API)
-                .csrf(csrf -> csrf.disable())
+                .csrf(ServerHttpSecurity.CsrfSpec::disable)
+                .httpBasic(ServerHttpSecurity.HttpBasicSpec::disable)
+                .formLogin(ServerHttpSecurity.FormLoginSpec::disable)
 
-                // ❌ pas de session
-                .sessionManagement(sm ->
-                        sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .authorizeExchange(ex -> ex
+                        .anyExchange().authenticated()
                 )
 
-                // ❌ pas de form login / basic auth
-                .formLogin(form -> form.disable())
-                .httpBasic(basic -> basic.disable())
-
-                // 🔐 Sécurité des endpoints
-                .authorizeHttpRequests(auth -> auth
-                        .anyRequest().permitAll()
+                .addFilterAt(
+                        authWebFilter,
+                        SecurityWebFiltersOrder.AUTHENTICATION
                 )
-
-                // ❌ pas de CORS ici
-                .cors(cors -> cors.disable())
 
                 .build();
     }
